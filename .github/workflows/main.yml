@@ -7,7 +7,8 @@ jobs:
   build:
     name: Build and Test
     runs-on: windows-2022
-
+    permissions:
+      contents: read
 #on:
 #  push:
 #    branches: [ master ]  # Change if your main branch is called 'main'
@@ -17,38 +18,32 @@ jobs:
 #    name: Build and Test
 #    runs-on: self-hosted
 
-    env:
-      solution: '**/*.sln'
-      buildPlatform: 'Any CPU'
-      buildConfiguration: 'Release'
-
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1
-
-    - name: Restore NuGet packages
-      run: nuget restore $env:solution
-
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.3
-
-    - name: Build the solution
-      run: msbuild $env:solution /p:Configuration=$env:buildConfiguration /p:Platform="$env:buildPlatform" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="${{ github.workspace }}\\drop\\WebApp.zip" /p:DeployIisAppPath="Default Web Site"
-
-    - name: Run Tests
-      uses: microsoft/vstest-action@v1
+      uses: actions/checkout@v4
+      
+    - name: Set up .NET 8 SDK
+      uses: actions/setup-dotnet@v4
       with:
-        platform: ${{ env.buildPlatform }}
-        configuration: ${{ env.buildConfiguration }}
+         dotnet-version: 'v8.0'
+         
+    - name: Restore dependencies
+      run: dotnet restore
 
-    - name: Upload Artifact
+    - name: Build project
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run tests (if any)
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Publish to temp folder
+      run: dotnet publish -c Release -o ./publish_output --no-build  # Publish compiled app to ./publish_output
+
+    - name: Upload published artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: drop
-        path: drop/WebApp.zip
+        name: dotnet8-app-publish
+        path: ./publish_output
 
   deploy:
     name: Deploy to Azure Web App
@@ -58,14 +53,11 @@ jobs:
     steps:
     - name: Download Artifact
       uses: actions/download-artifact@v4
-      with:
-        name: drop
-        path: drop
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'devWebapp101'
+        app-name: 'gitappPIP'
         slot-name: 'production'
-        package: drop/WebApp.zip
+        package: ./publish_output
         publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
