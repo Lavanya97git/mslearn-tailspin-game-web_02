@@ -1,13 +1,21 @@
 name: .NET CI/CD Pipeline
 
 on:
-  push:
-    branches: [ master ]  # Change if your main branch is called 'main'
+  workflow_dispatch:  # 👈 This enables manual "Run workflow" trigger from Actions tab
 
 jobs:
   build:
     name: Build and Test
     runs-on: self-hosted
+
+#on:
+#  push:
+#    branches: [ master ]  # Change if your main branch is called 'main'
+
+#jobs:
+#  build:
+#    name: Build and Test
+#    runs-on: self-hosted
 
     env:
       solution: '**/*.sln'
