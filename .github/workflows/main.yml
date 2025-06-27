@@ -49,15 +49,25 @@ jobs:
     name: Deploy to Azure Web App
     needs: build
     runs-on: windows-2022
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
     - name: Download Artifact
       uses: actions/download-artifact@v4
+      with:
+        name: dotnet8-app-publish
 
+    - name: Azure web login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'gitappPIP'
         slot-name: 'production'
-        package: ./publish_output
-        publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
+        package: .
+#        publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
