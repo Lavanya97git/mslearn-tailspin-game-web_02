@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build and Test
-    runs-on: self-hosted
+    runs-on: windows-2022
 
 #on:
 #  push:
