@@ -1,0 +1,32 @@
+name: .NET CI/CD Pipeline
+
+on:
+  workflow_dispatch: # 👈 This enables manual "Run workflow" trigger from Actions tab
+jobs:
+  build:
+    name: Build and Test
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Publish application
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Build Docker image
+        run: docker build -t my-dotnet-app ./publish
+
+      - name: Run Docker container
+        run: |
+          docker stop my-running-app || true
+          docker rm my-running-app || true
+          docker run -d --name my-running-app -p 80:80 my-dotnet-app
