@@ -19,9 +19,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Publish application
-        run: dotnet publish -c Release -o ./publish
-
       - name: Build Docker image
         run: docker build -t my-dotnet-app ./publish
 
