@@ -10,7 +10,7 @@ RUN dotnet publish -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "MyApp.dll"]
+ENTRYPOINT ["dotnet", "Tailspin.SpaceGame.Web.dll"]
 
 # # Use the .NET 8 SDK to build the app
 # FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
