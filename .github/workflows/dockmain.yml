@@ -27,3 +27,13 @@ jobs:
 
       - name: Remove old image if exists
         run: docker rmi myapp || true
+
+      - name: Wait for 2 mins before stopping
+        run: |
+          echo "App is live. Waiting 2 mins..."
+          sleep 120
+
+      - name: Stop container after wait
+        run: |
+          echo "Stopping container now..."
+          docker stop myapp
