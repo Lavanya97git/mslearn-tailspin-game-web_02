@@ -21,9 +21,9 @@ jobs:
           docker stop myapp || true
           docker rm myapp || true
 
-      - name: Remove old image if exists
-        run: docker rmi myapp || true
-
       - name: Run new Docker container
         run: |
           docker run -d -p 8080:80 --name myapp myapp:latest
+
+      - name: Remove old image if exists
+        run: docker rmi myapp || true
