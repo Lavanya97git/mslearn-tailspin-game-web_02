@@ -25,5 +25,5 @@ jobs:
         run: |
           docker run -d -p 8080:80 --name myapp myapp:latest
 
-    #   - name: Remove old image if exists
-    #     run: docker rmi myapp || true
+      - name: Remove old image if exists
+        run: docker rmi myapp || true
