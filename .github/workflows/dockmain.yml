@@ -16,14 +16,13 @@ jobs:
       - name: Build Docker image
         run: docker build -t myapp:latest .
 
-      - name: Remove old image if exists
-        run: |
-          docker rmi myapp || true
-
       - name: Stop & Remove old container if running
         run: |
           docker stop myapp || true
           docker rm myapp || true
+
+      - name: Remove old image if exists
+        run: docker rmi myapp || true
 
       - name: Run new Docker container
         run: |
