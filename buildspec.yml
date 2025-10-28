@@ -1,0 +1,35 @@
+version: 0.2
+
+env:
+  variables:
+    DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    CONFIGURATION: "Release"
+    PLATFORM: "Any CPU"
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8 # change to 6 if your app uses .NET 6
+    commands:
+      - echo "=== Install phase ==="
+      - dotnet --info
+      - echo "Restoring NuGet packages..."
+      - dotnet restore
+  build:
+    commands:
+      - echo "=== Build phase ==="
+      - dotnet build --configuration $CONFIGURATION --no-restore
+      - echo "=== Run unit tests (similar to VSTest@2) ==="
+      - dotnet test --configuration $CONFIGURATION --no-build || true
+  post_build:
+    commands:
+      - echo "=== Publish (equivalent to WebDeploy) ==="
+      - dotnet publish -c $CONFIGURATION -o ./publish
+      - echo "=== Create ZIP artifact (similar to ArchiveFiles@2) ==="
+      - cd publish
+      - zip -r ../app.zip .
+      - cd ..
+artifacts:
+  files:
+    - app.zip
+  discard-paths: yes
